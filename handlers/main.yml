@@ -1,0 +1,11 @@
+---
+# handlers file for minio-cluster
+- name: reload minio systemd
+  ansible.builtin.systemd:
+    name: minio
+    daemon_reload: True
+
+- name: restart minio
+  ansible.builtin.service:
+    name: minio
+    state: restarted

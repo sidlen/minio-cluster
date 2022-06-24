@@ -1,0 +1,30 @@
+---
+# defaults file for minio-cluster
+#acrhitecture detection
+go_arch_map:
+  i386: '386'
+  x86_64: 'amd64'
+  aarch64: 'arm64'
+  armv7l: 'arm'
+  armv6l: 'arm6vl'
+
+go_arch: "{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}"
+
+#user and group for minio-cluster
+minio_user: minio
+minio_group: minio
+
+#working directory
+work_dir: /var/lib/minio
+
+#minio config path
+minio_server_envfile: /etc/default/minio
+
+#prometheus authentication type (public or jwt)
+prometheus_ath_type: "public"
+
+# Minio server listen address
+minio_server_addr: ":9000"
+
+# Additional Minio server CLI options
+minio_server_opts: "--console-address :9001"

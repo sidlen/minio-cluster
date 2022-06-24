@@ -1,0 +1,105 @@
+
+---
+# tasks file for minio-cluster
+
+# Set fact minio dowload url with architecture dependent
+- name: Compose the Minio server download base url
+  set_fact:
+    _minio_server_download_base_url: "https://dl.minio.io/server/minio/release/linux-{{ go_arch }}"
+
+# Check the release specification (default: latest)
+- name: Compose the Minio server download url with lastest release
+  set_fact:
+    _minio_server_download_url: "{{ _minio_server_download_base_url }}/minio"
+  when: minio_server_release | length == 0
+- name: "Compose the Minio server download url with release {{ minio_server_release }}"
+  set_fact:
+    _minio_server_download_url: "{{ _minio_server_download_base_url }}/archive/minio.{{ minio_server_release }}"
+  when: minio_server_release | length > 0
+
+# Get checksum of downloaded minio server
+- name: "Get the Minio server checksum for {{ go_arch }} architecture"
+  set_fact:
+    _minio_server_checksum: "{{ lookup('url', _minio_server_download_url + '.sha256sum').split(' ')[0] }}"
+
+# Create group for executing user
+- name: Create group
+  ansible.builtin.group:
+    name: "{{ minio_group }}"
+    state: present
+
+# Create the executing user
+- name: Create user
+  ansible.builtin.user:
+    name: "{{ minio_user }}"
+    group: "{{ minio_group }}"
+
+# Grant access to work directory for executing user
+- name: Create and access work directory
+  ansible.builtin.file:
+    path: "{{ work_dir }}"
+    owner: "root"
+    group: "{{ minio_group }}"
+    state: directory
+
+# Download minio server with success check and checksum check
+- name: Download minio
+  ansible.builtin.get_url:
+    url: "{{ _minio_server_download_url }}"
+    dest: "{{ work_dir }}/minio"
+    owner: "root"
+    group: "{{ minio_group }}"
+    mode: '0774'
+    checksum: "sha256:{{ _minio_server_checksum }}"
+  register: _download_server
+  until: _download_server is succeeded
+  retries: 5
+  delay: 2
+  notify: restart minio
+
+# Find disks for minio data
+- name: Find disks for minio
+  ansible.builtin.find:
+    path: "{{ mount_point }}"
+    file_type: directory
+    patterns: "{{ pattern_dir }}"
+  register: minio_disks
+
+# Grant access to minio data disks for executing user
+- name: Access to mount point disk for minio
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    owner: "{{ minio_user }}"
+    group: "{{ minio_group }}"
+    recurse: yes
+  loop: "{{ minio_disks.files }}"
+
+# Generate and push minio environment (config) file
+- name: Generate the Minio server envfile
+  ansible.builtin.template:
+    src: minio.env.j2
+    dest: "{{ minio_server_envfile }}"
+    owner: "root"
+    group: "{{ minio_group }}"
+    mode: '0660'
+  notify: restart minio
+
+# Generate and push minio daemon file
+- name: Generate the minio.service file
+  ansible.builtin.template:
+    src: minio.service.j2
+    dest: "/etc/systemd/system/minio.service"
+    owner: "root"
+    group: "root"
+  when: ansible_service_mgr == "systemd"
+  notify:
+    - reload minio systemd
+    - restart minio
+
+# Enable and start minio service
+- name: Enable and start minio.service
+  ansible.builtin.systemd:
+    name: minio
+    state: started
+    enabled: yes
+    daemon_reload: yes
