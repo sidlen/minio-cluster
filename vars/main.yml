@@ -17,7 +17,7 @@ minio_secret_key: ""
 
 #minio root credential (default: minioadmin:minioadmin)
 minio_root_user: "sre"
-minio_root_password: "Softline*123"
+minio_root_password: ""
 
 #minio-cluster load balancer url
 minio_lb_url: "http://minio:9000"
