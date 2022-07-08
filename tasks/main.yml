@@ -126,7 +126,7 @@
     group: "nodeusr"
     state: directory
 
-# download node-exporter
+# Download node-exporter
 - name: Download node-exporter
   ansible.builtin.get_url:
     url: "{{ node_exporter_download_url }}"
@@ -135,11 +135,8 @@
     owner: "root"
     group: "nodeusr"
     mode: '0774'
-#  register: _download_exporter
-#  until: _download_exporter is succeeded
-#  retries: 5
-#  delay: 2
 
+# Unarchive exporter
 - name: Unarchive exporter
   ansible.builtin.unarchive:
     src: /etc/nodeexporter/node-exporter.tar.gz
@@ -148,6 +145,7 @@
     list_files: yes
   register: node_exporter_path
 
+# Copy bin file
 - name: Copy bin file
   ansible.builtin.copy:
     src: /etc/nodeexporter/{{ node_exporter_path.files[3] }}
@@ -155,6 +153,7 @@
     mode: "0755"
     remote_src: yes
 
+# Copy node_exporter.service
 - name: Copy node_exporter.service
   ansible.builtin.copy:
     src: files/node_exporter.service
@@ -163,10 +162,7 @@
     group: "nodeusr"
     mode: '0640'
 
-#- name: Daemon reload
-#  ansible.builtin.systemd:
-#    daemon_reload: yes
-
+# Start node_exporter.service
 - name: Start node_exporter.service
   ansible.builtin.systemd:
     name: node-exporter
