@@ -1,0 +1,25 @@
+---
+dependency:
+  name: galaxy
+  enabled: false
+driver:
+  name: docker
+lint: yamllint
+platforms:
+  - name: minio ubuntu 20.04
+    image: ubuntu:20.04
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+#  otpions:
+#    diff: True
+#    v: True
+#  playbooks:
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: "Include minio-cluster"
+      ansible.builtin.include_role:
+        name: "minio-cluster"
