@@ -2,7 +2,7 @@ galaxy_info:
   author: sidlen
   description: Install MinIO cluster
   company: Softline
-  role_name: minio-cluster
+  role_name: minio_cluster
   namespace: sidlen
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value

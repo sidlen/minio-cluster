@@ -4,17 +4,14 @@
   ansible.builtin.systemd:
     name: minio
     daemon_reload: True
-
 - name: restart minio
   ansible.builtin.service:
     name: minio
     state: restarted
-
 #- name: enable node-exporter
 #  ansible.builtin.systemd:
 #    name: node_exporter
 #    daemon_reload: True
-
 #- name: start node-exporter
 #  ansible.builtin.service:
 #    name: node_exporter
