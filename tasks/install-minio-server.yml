@@ -26,6 +26,7 @@
   ansible.builtin.group:
     name: "{{ minio_group }}"
     state: present
+  become: true
 
 # Create the executing user
 - name: Create user

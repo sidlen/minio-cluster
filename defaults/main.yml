@@ -1,12 +1,13 @@
 ---
 # defaults file for minio-cluster
 #acrhitecture detection
-go_arch_map:
-  i386: '386'
-  x86_64: 'amd64'
-  aarch64: 'arm64'
+#go_arch_map:
+#  i386: '386'
+#  x86_64: 'amd64'
+#  aarch64: 'arm64'
 
-go_arch: "{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}"
+#go_arch: "{{ go_arch_map[ansible_facts.ansible_architecture] | default(ansible_facts.ansible_architecture) }}"
+go_arch: amd64
 
 #user and group for minio-cluster
 minio_user: minio

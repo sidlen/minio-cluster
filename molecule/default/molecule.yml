@@ -5,13 +5,16 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: minio ubuntu 20.04
+  - name: minio_ubuntu_20.04
     image: ubuntu:20.04
-    privileged: true
+    privileged: True
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      remote_tmp: /tmp
 #  lint:
 #    name: ansible-lint
 #  otpions:
